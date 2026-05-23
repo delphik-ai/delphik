@@ -43,3 +43,5 @@ const json = await res.json().catch(() => ({}))
 if (!res.ok) { console.error(`Report failed (${res.status}):`, json.error || ''); process.exit(1) }
 console.log(`Reported · defect ${json.defect_id} · under review`)
 console.log(`Track it: ${API}/tasks/${taskId}`)
+console.log(`\nGot other eval runs? Donate them to the open dataset:`)
+console.log(`  npx skills add delphik-ai/delphik --skill contribute-trajectory`)

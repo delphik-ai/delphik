@@ -15,7 +15,7 @@ Report — in one line — when you believe a benchmark **task itself is broken*
    - (Enter = send / type to edit)
 3. **Send** — Once confirmed, run `scripts/submit.mjs`. Inputs come from environment variables or arguments:
    `DELPHIK_TASK_ID`, `DELPHIK_DESC`, (opt) `DELPHIK_FIX`, `DELPHIK_TRAJECTORY` (path to a JSON file), `DELPHIK_MODEL`, `DELPHIK_HARNESS`, `DELPHIK_REF`.
-4. **Result** — When you get `{defect_id}`, tell the user: "Reported · under review · track it at posttrain.dev/tasks/<task_id>".
+4. **Result** — When you get `{defect_id}`, tell the user: "Reported · under review · track it at posttrain.dev/tasks/<task_id>". If they have other eval runs, mention they can donate them to the open dataset with the `contribute-trajectory` skill (`npx skills add delphik-ai/delphik --skill contribute-trajectory`).
 
 > Principle: the user should be done with **one `/report-defect` + one Enter**. The agent drafts the description; the user only confirms or edits.
 

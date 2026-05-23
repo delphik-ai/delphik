@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Delphik /report-defect submit. 토큰(~/.delphik/token) 읽어 POST /api/report.
-// 입력 = 환경변수: DELPHIK_TASK_ID, DELPHIK_DESC, (opt) DELPHIK_FIX, DELPHIK_TRAJECTORY(파일경로),
-//        DELPHIK_MODEL, DELPHIK_HARNESS, DELPHIK_REF, DELPHIK_API(기본 https://posttrain.dev)
+// Delphik /report-defect submit. Reads token (~/.delphik/token) and POSTs /api/report.
+// Inputs = env vars: DELPHIK_TASK_ID, DELPHIK_DESC, (opt) DELPHIK_FIX, DELPHIK_TRAJECTORY (file path),
+//          DELPHIK_MODEL, DELPHIK_HARNESS, DELPHIK_REF, DELPHIK_API (default https://posttrain.dev)
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -11,13 +11,13 @@ const tokenPath = join(homedir(), '.delphik', 'token')
 
 let token
 try { token = readFileSync(tokenPath, 'utf8').trim() } catch {
-  console.error(`No token. 먼저 ${API}/skill-auth 에서 GitHub 로그인 → dpk_ 토큰을 ${tokenPath} 에 저장하세요.`)
+  console.error(`No token. First sign in with GitHub at ${API}/skill-auth, then save the dpk_ token to ${tokenPath}.`)
   process.exit(2)
 }
 
 const taskId = process.env.DELPHIK_TASK_ID
 const description = process.env.DELPHIK_DESC
-if (!taskId || !description) { console.error('DELPHIK_TASK_ID, DELPHIK_DESC 필요'); process.exit(2) }
+if (!taskId || !description) { console.error('DELPHIK_TASK_ID and DELPHIK_DESC are required'); process.exit(2) }
 
 let trajectory
 if (process.env.DELPHIK_TRAJECTORY) {
@@ -40,6 +40,6 @@ const res = await fetch(`${API}/api/report`, {
   body: JSON.stringify(body),
 })
 const json = await res.json().catch(() => ({}))
-if (!res.ok) { console.error(`신고 실패 (${res.status}):`, json.error || ''); process.exit(1) }
-console.log(`신고됨 · defect ${json.defect_id} · under review`)
-console.log(`진행상황: ${API}/tasks/${taskId}`)
+if (!res.ok) { console.error(`Report failed (${res.status}):`, json.error || ''); process.exit(1) }
+console.log(`Reported · defect ${json.defect_id} · under review`)
+console.log(`Track it: ${API}/tasks/${taskId}`)

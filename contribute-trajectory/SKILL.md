@@ -5,22 +5,22 @@ description: Donate your benchmark run trajectories to Delphik's open dataset. U
 
 # /contribute-trajectory
 
-자기 eval run trajectory를 open 데이터셋에 기부 (defect 없이도). fail이 더 가치 있음.
+Donate your own eval run trajectories to the open dataset (no defect required). Failures are especially valuable.
 
-## 절차 (agentic discovery)
-1. **스캔** — 인자 없이 실행되면 현재 레포의 **`jobs/` 디렉토리**를 찾는다. `harbor run`은 `jobs/<job>/<trial>/agent/trajectory.json`(ATIF) + `verifier/reward.txt`(결과) + `config.json`(task/dataset/ref)에 저장. `jobs/`가 없으면 사용자에게 위치를 묻는다.
-2. **현황 제시** — 각 trial을 표로: `# · task · benchmark · model · result · when`. (config.json·reward.txt 파싱.)
-3. **선택** — 사용자가 자연어로 고른다 ("fail 전부", "1,2,4", "전부").
-4. **매핑·확인** — 각 trajectory를 (task, harbor_ref)로 자동 매핑. **민감정보 경량 스캔**(`ghp_`/`sk-`/`API_KEY=`/`.env` 라인) → "N건 마스킹" 고지 + confirm.
-5. **업로드** — `scripts/submit.mjs` 실행 (선택분을 `POST /api/contribute` batch).
+## Procedure (agentic discovery)
+1. **Scan** — When run without arguments, find the **`jobs/` directory** in the current repo. `harbor run` stores each run at `jobs/<job>/<trial>/agent/trajectory.json` (ATIF) + `verifier/reward.txt` (result) + `config.json` (task/dataset/ref). If there's no `jobs/`, ask the user where it is.
+2. **Show status** — List each trial in a table: `# · task · benchmark · model · result · when`. (Parsed from config.json and reward.txt.)
+3. **Select** — The user picks in plain language ("all the failures", "1,2,4", "everything").
+4. **Map & confirm** — Map each trajectory to its (task, harbor_ref) automatically. Run a **lightweight secret scan** (`ghp_` / `sk-` / `API_KEY=` / `.env` lines) → report "N entries masked" and confirm.
+5. **Upload** — Run `scripts/submit.mjs` (sends the selection to `POST /api/contribute` as a batch).
 
-## 인증
-report-defect와 **같은 토큰**(`~/.delphik/token`). 없으면 https://posttrain.dev/skill-auth 안내.
+## Auth
+Uses the **same token** as report-defect (`~/.delphik/token`). If missing, point the user to https://posttrain.dev/skill-auth.
 
-## 전송 대상
+## Endpoint
 `POST https://posttrain.dev/api/contribute` · `Authorization: Bearer dpk_...`
 ```json
 { "items": [ { "task_ref": "<harbor_task_ref>", "harbor_ref": "@2.0",
               "trajectory": { "steps": [...] }, "model_name": "...", "harness_name": "...", "scored_result": "fail" } ] }
 ```
-응답 `201 { uploaded:[...], skipped:[{task, reason}] }`. (스펙: docs/v4/back/skill-contribute.md)
+Response `201 { uploaded:[...], skipped:[{task, reason}] }`. (Spec: docs/v4/back/skill-contribute.md)

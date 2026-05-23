@@ -7,8 +7,8 @@ npx skills add delphik-ai/delphik --skill report-defect [--skill contribute-traj
 /report-defect
 ```
 
-- `report-defect` — 벤치마크 task가 깨졌을 때 1초 신고.
-- `contribute-trajectory` — 자기 run trajectory를 open 데이터셋에 기부.
+- `report-defect` — report a broken benchmark task in seconds.
+- `contribute-trajectory` — donate your own run trajectories to the open dataset.
 
 First run prompts a one-time GitHub login at https://posttrain.dev/skill-auth.
 Format = Anthropic Agent Skills (SKILL.md). Install via Vercel Labs `skills` CLI.

@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 // Delphik /contribute-trajectory submit. Reads token and POSTs /api/contribute (batch).
 // Inputs = DELPHIK_ITEMS (file path, JSON array [{task_ref|task_id, harbor_ref, trajectory, model_name, harness_name, scored_result}])
-//          DELPHIK_API (default https://posttrain.dev)
+//          DELPHIK_API (default https://posttrain.dev), DELPHIK_TOKEN (overrides the token file — handy for dev testing)
 import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
 const API = process.env.DELPHIK_API || 'https://posttrain.dev'
-const tokenPath = join(homedir(), '.delphik', 'token')
+// Per-environment token file (localhost → token.dev, else token) so dev never reuses the prod token.
+const tokenPath = join(homedir(), '.delphik', /localhost|127\.0\.0\.1/.test(API) ? 'token.dev' : 'token')
 
-let token
-try { token = readFileSync(tokenPath, 'utf8').trim() } catch {
-  console.error(`No token. Sign in at ${API}/skill-auth, then save the dpk_ token to ${tokenPath}.`)
-  process.exit(2)
+// DELPHIK_TOKEN env overrides the file (dev testing without clobbering ~/.delphik/token).
+let token = process.env.DELPHIK_TOKEN?.trim()
+if (!token) {
+  try { token = readFileSync(tokenPath, 'utf8').trim() } catch {
+    console.error(`No token. Set DELPHIK_TOKEN, or sign in at ${API}/skill-auth and save the dpk_ token to ${tokenPath}.`)
+    process.exit(2)
+  }
 }
 
 const itemsPath = process.env.DELPHIK_ITEMS

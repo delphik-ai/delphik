@@ -12,10 +12,10 @@ Donate your own eval run trajectories to the open dataset (no defect required). 
 2. **Show status** — List each trial in a table: `# · task · benchmark · model · result · when`. (Parsed from config.json and reward.txt.)
 3. **Select** — The user picks in plain language ("all the failures", "1,2,4", "everything").
 4. **Map & confirm** — Map each trajectory to its (task, harbor_ref) automatically. Run a **lightweight secret scan** (`ghp_` / `sk-` / `API_KEY=` / `.env` lines) → report "N entries masked" and confirm.
-5. **Upload** — Run `scripts/submit.mjs` (sends the selection to `POST /api/contribute` as a batch).
+5. **Upload** — Write the selected items to JSON, show the user the selection summary, wait for confirmation, then run `scripts/submit.mjs <items.json>` (sends the selection to `POST /api/contribute` as a batch). Stdin also works: `cat items.json | node scripts/submit.mjs -`.
 
 ## Auth
-Uses the **same token** as report-defect (`~/.delphik/token`). If missing, point the user to https://posttrain.dev/skill-auth.
+Uses the **same token** as report-defect (`~/.delphik/token` for prod, `~/.delphik/token.dev` for localhost). If `submit.mjs` exits with **`NEEDS_SIGNIN  run-script: <path>`**, launch the printed `login.mjs` in the background, show the sign-in URL to the user, wait for `✓ Signed in`, then re-run the submit.
 
 ## Endpoint
 `POST https://posttrain.dev/api/contribute` · `Authorization: Bearer dpk_...`

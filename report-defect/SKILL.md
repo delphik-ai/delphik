@@ -21,8 +21,8 @@ All URLs below use the shell expansion **`${DELPHIK_API:-https://posttrain.dev}`
    - (c) repo / base commit / failing test (for matching when the id alone is ambiguous).
    - If from `harbor run -d <dataset>@<ref>`, also read the **`ref`** (the version).
 2. **Resolve the task** — the upstream id is often formatted differently inside Delphik (adapters add prefixes/suffixes like `instance_…-v<sha>`, or use synthesized ids), so **don't guess — look it up** via the public catalog:
-   - `curl -s "${DELPHIK_API:-https://posttrain.dev}/api/benchmarks"` → pick the benchmark whose `github_repo` / `name` / `display_name` matches what you ran → take its **`name`**.
-   - `curl -s "${DELPHIK_API:-https://posttrain.dev}/api/tasks?benchmark=<name>"` → in `tasks[]`, find the entry whose `task_name` corresponds to the user's task (allow for prefix/suffix/separator differences; use repo/commit/test to be sure) → take its **`id`** (the Delphik task id).
+   - `curl -s "${DELPHIK_API:-https://posttrain.dev}/api/benchmarks"` → this returns a benchmark array. Pick the benchmark whose `github_repo` / `name` / `display_name` matches what you ran → take its **`name`**.
+   - `curl -s "${DELPHIK_API:-https://posttrain.dev}/api/tasks?benchmark=<name>&include_all_tasks=1"` → this returns `{ tasks: [...] }`. In `tasks[]`, find the entry whose `task_name` corresponds to the user's task (allow for prefix/suffix/separator differences; use repo/commit/test to be sure) → take its **`id`** (the Delphik task id).
    - **Benchmark not in Delphik** → tell the user *"Delphik doesn't cover **<benchmark>** yet"* and ask if they want to **send their trajectory to the Delphik admin so it can be added**. If yes, run `scripts/request-benchmark.mjs` (env: `DELPHIK_BENCHMARK` or `DELPHIK_REPO`, `DELPHIK_DESC`, opt `DELPHIK_TASK` / `DELPHIK_TRAJECTORY` / `DELPHIK_MODEL` / `DELPHIK_HARNESS`) → then **stop** (there's no catalog task to file against).
    - **Task not found** in a known benchmark → ask the user for the task link/name.
    - (The catalog endpoints are **public — no token needed**.)
@@ -59,7 +59,7 @@ If `submit.mjs` exits with **`NEEDS_SIGNIN  run-script: <path>`**, do this (don'
 1. **Launch `<path>` (the printed `login.mjs`) in the BACKGROUND** — use the Bash tool's `run_in_background: true` so the loopback server stays alive across your turns. Capture the shell id.
 2. **Read the script's printed URL** (it'll be `${DELPHIK_API:-https://posttrain.dev}/skill-auth?callback=…&state=…`) and **show it to the user**: *"Sign in here: <url> — click 'Continue with GitHub'. Tell me when the page says '✓ Signed in'."* The browser also opens automatically; the URL is the fallback if it didn't.
 3. **Wait for the user's confirmation** (or poll the background shell's output for `✓ Signed in. Token saved`). Don't spin — the user clicks at their own pace.
-4. **Re-run `submit.mjs`** — the token is now at the per-host path (`~/.delphik/token`) and the call succeeds.
+4. **Re-run `submit.mjs`** — the token is now at the per-host path (`~/.delphik/token` or `token.dev`) and the call succeeds.
 
 Silent on every subsequent call. (Token shared by both skills.)
 

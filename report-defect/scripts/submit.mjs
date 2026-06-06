@@ -28,6 +28,7 @@ const API = process.env.DELPHIK_API || 'https://posttrain.dev'
 const tokenPath = join(homedir(), '.delphik', /localhost|127\.0\.0\.1/.test(API) ? 'token.dev' : 'token')
 
 // --- token ---
+const tokenFromEnv = Boolean(process.env.DELPHIK_TOKEN?.trim())
 let token = process.env.DELPHIK_TOKEN?.trim()
 if (!token) {
   try { token = readFileSync(tokenPath, 'utf8').trim() } catch {
@@ -108,8 +109,9 @@ const res = await fetch(`${API}/api/report`, {
 const json = await res.json().catch(() => ({}))
 if (res.status === 401) {
   const loginScript = new URL('./login.mjs', import.meta.url).pathname
+  const tokenLabel = tokenFromEnv ? 'The DELPHIK_TOKEN env value' : `The stored token at ${tokenPath}`
   console.error(`NEEDS_SIGNIN  run-script: ${loginScript}
-The stored token at ${tokenPath} is no longer accepted (${json.error || '401 unauthorized'}).
+${tokenLabel} is no longer accepted (${json.error || '401 unauthorized'}).
 Agent: launch this script with run_in_background:true (Bash tool), read the printed
 sign-in URL, ask the user to click "Continue with GitHub", wait for the background log to
 show "✓ Signed in", then re-run me. The token is overwritten in place.`)
